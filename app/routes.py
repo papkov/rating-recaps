@@ -21,19 +21,28 @@ def index():
         # If find existing team
         if request.form['idteam'] and request.form['idteam'] != "0":
             # Get general team info
-            team_info = get_team_info(request.form['idteam'])
-            flash('Requested ID {} for team {}'.format(request.form['idteam'], team_info["name"]))
-            populate_team_form(team_form, team_info)
-            # session['team_form'] = team_form.data
+            status_code, team_info = get_team_info(request.form['idteam'])
+            if status_code != 200:
+                flash('Rating request for team info failed with status code {}'.format(status_code))
+            else:
+                flash('Requested ID {} for team {}'.format(request.form['idteam'], team_info["name"]))
+                populate_team_form(team_form, team_info)
+                # session['team_form'] = team_form.data
 
-            # Get base recaps, pre-fill recaps form with it
-            team_recaps = get_base_recaps(team_form.idteam.data)
-            player_forms = []
-            for idplayer in team_recaps['players']:
-                player_info = get_player_info(idplayer)
-                player_form = PlayerForm()
-                populate_player_form(player_form, player_info)
-                player_forms.append(player_form)
+                # Get base recaps, pre-fill recaps form with it
+                status_code, team_recaps = get_base_recaps(team_form.idteam.data)
+                if status_code != 200:
+                    flash('Rating request for base recaps failed with status code {}'.format(status_code))
+                else:
+                    player_forms = []
+                    for idplayer in team_recaps['players']:
+                        status_code, player_info = get_player_info(idplayer)
+                        if status_code != 200:
+                            flash('Rating request for player {} info failed with status code {}'.format(idplayer, status_code))
+                        else:
+                            player_form = PlayerForm()
+                            populate_player_form(player_form, player_info)
+                            player_forms.append(player_form)
 
             # session['player_forms'] = [f.data for f in player_forms]
         # If create a new team with id 0
@@ -53,9 +62,12 @@ def index():
     # Handle find player by id
     if request.method == 'POST' and 'btn-find-player' in request.form:
         if request.form['idplayer'] != 0:
-            player_info = get_player_info(request.form['idplayer'])
-            form_id = int(request.form['btn-find-player'])
-            populate_player_form(player_forms[form_id], player_info)
+            status_code, player_info = get_player_info(request.form['idplayer'])
+            if status_code != 200:
+                flash('Rating request for player {} info failed with status code {}'.format(idplayer, status_code))
+            else:
+                form_id = int(request.form['btn-find-player'])
+                populate_player_form(player_forms[form_id], player_info)
 
     # Handle remove player
     if request.method == 'POST' and 'btn-remove-player' in request.form:
