@@ -114,7 +114,7 @@ def login():
 @app.route('/<filename>')
 def safe_csv_sender(filename):
     app.logger.info('Download file {}'.format(filename))
-    return send_from_directory('recaps',
+    return send_from_directory('../collected_recaps',
                                filename,
                                mimetype='text/csv',
                                as_attachment=True,
