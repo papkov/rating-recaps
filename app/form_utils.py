@@ -65,13 +65,13 @@ def get_csv(player_forms, team_form):
     return '\n'.join(rating_strs)
 
 
-def save_csv(player_forms, team_form):
+def save_csv(player_forms, team_form, folder_name='collected_recaps'):
     txt = get_csv(player_forms, team_form)
 
-    if 'recaps' not in os.listdir('./app/'):
-        os.mkdir('./app/recaps')
+    if folder_name not in os.listdir('.'):
+        os.mkdir(os.path.join('.', folder_name))
 
-    fn = './app/recaps/recaps_{}.csv'.format(team_form.idteam.data)
+    fn = os.path.join('.', folder_name, 'recaps_{}.csv'.format(team_form.idteam.data))
     with io.open(fn, 'w+', encoding="utf-8") as f:
         f.write(txt)
 
