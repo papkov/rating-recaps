@@ -7,76 +7,69 @@
         <h2>Сбор составов команд</h2>
         <br>
         <!--Form for team id request-->
+
         <form action="" method="post">
-            {{ team_form.hidden_tag() }}
+            {{ recaps_form.hidden_tag() }}
             <div class="form-group">
                 <div class="container">
+                    <!-- Team data -->
                     <div class="row">
-                        <div class="col-12 col-md-2">
-                            <div class="row">
-                                <div class="col-2 col-md-4 text-center"> <button class="btn" name="btn-find-team" value="0" title="Найти команду или создать пустую форму"><i class="fa fa-search"></i></button> </div>
-                                <div class="col-10 col-md-8"> {{ team_form.idteam(class="form-control", placeholder="ID")}} </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-3"> {{ team_form.team_name(class="form-control", placeholder="Название")}} </div>
-                        <div class="col-12 col-md-3"> {{ team_form.town(class="form-control", placeholder="Город")}} </div>
-                        <div class="col-12 col-md-3"> {{ team_form.institute(class="form-control", placeholder="Вуз")}} </div>
-                        <div class="col-12 col-md-1">
-                            <div class="row">
-                                <div class="col-6 text-center"> <button class="btn" name="btn-add-player" value="0" title="Добавить игрока"><i class="fa fa-plus"> </i></button> </div>
-                                <div class="col-6 text-center"> <button class="btn" name="btn-reset-team" value="0" title="Сбросить"><i class="fa fa-refresh"> </i></button> </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </form>
-
-        <hr>
-
-        <!--Forms for recaps-->
-        {% if player_forms %}
-            {% for player_form in player_forms %}
-                {% if player_form is not none%}
-                    <form action="" method="post">
-                        {{ player_form.hidden_tag() }}
-                        <div class="form-group">
-                            <div class="container">
+                            <!-- Team id and search button -->
+                            <div class="col-12 col-md-2">
                                 <div class="row">
-                                    <div class="col-12 col-md-2">
-                                        <div class="row">
-                                            <div class="col-2 col-md-4 text-center"><button class="btn" name="btn-find-player" value="{{ loop.index0 }}" title="Найти игрока"><i class="fa fa-search"> </i></button></div>
-                                            <div class="col-10 col-md-8"> {{ player_form.idplayer(class="form-control", placeholder="ID") }} </div>
-                                        </div>
+                                    <div class="col-2 col-md-4 text-center"> <button class="btn" name="btn-find-team" value="0" title="Найти команду или создать пустую форму"><i class="fa fa-search"></i></button> </div>
+                                    <div class="col-10 col-md-8"> {{ recaps_form.idteam(class="form-control", placeholder="ID")}} </div>
+                                </div>
+                            </div>
+                            <!-- Team info -->
+                            <div class="col-12 col-md-3"> {{ recaps_form.team_name(class="form-control", placeholder="Название")}} </div>
+                            <div class="col-12 col-md-3"> {{ recaps_form.town(class="form-control", placeholder="Город")}} </div>
+                            <div class="col-12 col-md-3"> {{ recaps_form.institute(class="form-control", placeholder="Вуз")}} </div>
+                            <!-- Add and reset buttons -->
+                            <div class="col-12 col-md-1">
+                                <div class="row">
+                                    <div class="col-6 text-center"> <button class="btn" name="btn-add-player" value="0" title="Добавить игрока"><i class="fa fa-plus"> </i></button> </div>
+                                    <div class="col-6 text-center"> <button class="btn" name="btn-reset-team" value="0" title="Сбросить"><i class="fa fa-refresh"> </i></button> </div>
+                                </div>
+                            </div>
+                    </div>
+
+                    <hr>
+                    <!-- Players' data -->
+                    {% for player_form in recaps_form.player_forms %}
+                        <div class="row">
+                            <!-- Player id and search button -->
+                            <div class="col-12 col-md-2">
+                                <div class="row">
+                                    <div class="col-2 col-md-4 text-center">
+                                        <!--<button class="btn" name="btn-find-player" value="{{ loop.index0 }}" title="Найти игрока"><i class="fa fa-search"> </i></button>-->
+                                        <button class="btn" name="btn-find-player" value="{{ player_form.form.find.name }}" title="Найти игрока"><i class="fa fa-search"> </i></button>
+                                        <!--{{ player_form.form.find(class="btn") }}-->
                                     </div>
-                                    <div class="col-12 col-md-2"> {{ player_form.surname(class="form-control", placeholder="Фамилия") }} </div>
-                                    <div class="col-12 col-md-2"> {{ player_form.name(class="form-control", placeholder="Имя") }} </div>
-                                    <div class="col-12 col-md-2"> {{ player_form.patronymic(class="form-control", placeholder="Отчество") }} </div>
-                                    <div class="col-12 col-md-1"> {{ player_form.status(class="form-control", placeholder="К/Б/Л") }} </div>
-                                    <div class="col-12 col-md-3">
-                                        <div class="row">
-                                            <div class="col-12 col-md-9"> {{ player_form.birthdate(class="form-control", placeholder="Дата рождения") }} </div>
-                                            <div class="col-12 col-md-3 text-center"><button class="btn" name="btn-remove-player" value="{{ loop.index0 }}" title="Убрать игрока"><i class="fa fa-close"> </i></button></div>
-                                        </div>
-                                    </div>
+
+                                    <div class="col-10 col-md-8"> {{ player_form.form.idplayer(class="form-control", placeholder="ID") }} </div>
+                                </div>
+                            </div>
+                            <!-- Player info -->
+                            <div class="col-12 col-md-2"> {{ player_form.form.surname(class="form-control", placeholder="Фамилия") }} </div>
+                            <div class="col-12 col-md-2"> {{ player_form.form.name(class="form-control", placeholder="Имя") }} </div>
+                            <div class="col-12 col-md-2"> {{ player_form.form.patronymic(class="form-control", placeholder="Отчество") }} </div>
+                            <div class="col-12 col-md-1"> {{ player_form.form.status(class="form-control", placeholder="К/Б/Л") }} </div>
+                            <!-- Birthdate and remove button -->
+                            <div class="col-12 col-md-3">
+                                <div class="row">
+                                    <div class="col-12 col-md-9"> {{ player_form.form.birthdate(class="form-control", placeholder="Дата рождения") }} </div>
+                                    <!--<div class="col-12 col-md-3 text-center"><button class="btn" name="btn-remove-player" value="{{ loop.index0 }}" title="Убрать игрока"><i class="fa fa-close"> </i></button></div>-->
+                                    <div class="col-12 col-md-3 text-center"><button class="btn" name="btn-remove-player" value="{{ player_form.form.remove.name }}" title="Убрать игрока"><i class="fa fa-close"> </i></button></div>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                {% endif %}
-            {% endfor %}
-            <hr>
-            <!--<button class="btn btn-primary" name="btn-remove-player" value=><span title="Отправить"></span></button>-->
-            <!--<div class="btn btn-success"></div>-->
-        {% endif %}
+                        <br>
+                    {% endfor %}
 
-        <!--Buttons for download and sending-->
-        {% if player_forms %}
-            <form action="" method="post">
-                {{ send_form.hidden_tag() }}
-                <div class="form-group">
-                    <div class="container">
+                    <!-- Submit buttons -->
+                    {% if recaps_form.player_forms|length > 0 %}
+                        <hr>
                         <div class="row">
                             <div class="col-12 col-sm-6 text-center">
                                 <button class="btn btn-success" name="btn-send-recaps" value="0" title=""><i class="fa fa-envelope"></i> Отправить состав </button>
@@ -85,11 +78,10 @@
                                 <button class="btn btn-success" name="btn-save-recaps" value="0" title=""><i class="fa fa-download"></i> Сохранить состав </button>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
                 </div>
-            </form>
-        {% endif %}
-
+            </div>
+        </form>
 
         <!--Flashed messages display-->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -109,8 +101,8 @@
             {% endif %}
         {% endwith %}
 
-        {% if team_form.errors %}
-            <div class="alert alert-warning">{{ team_form.errors }}</div>
+        {% if recaps_form.errors %}
+            <div class="alert alert-warning">{{ recaps_form.errors }}</div>
         {% endif %}
 
     </div>
