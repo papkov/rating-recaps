@@ -17,7 +17,7 @@ class PlayerForm(FlaskForm):
     status = SelectField('Статус', choices=[('Б', 'Б'), ('К', 'К'), ('Л', 'Л')], validators=[InputRequired()])
     surname = StringField('Фамилия', validators=[InputRequired()])
     name = StringField('Имя', validators=[InputRequired()])
-    patronymic = StringField('Отчество', validators=[InputRequired()])
+    patronymic = StringField('Отчество')
     birthdate = DateField('Дата рождения', validators=[InputRequired()])
 
     find = SubmitField()
