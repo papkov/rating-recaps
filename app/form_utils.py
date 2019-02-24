@@ -92,8 +92,8 @@ def populate_team_form(team_form, team_info):
         team_form.team_name.data = team_info['team_name']
     team_form.town.data = team_info['town']
     # Fill non-rating fields
-    if 'institute' in team_info:
-        team_form.institute.data = team_info['institute']
+    # if 'institute' in team_info:
+    #     team_form.institute.data = team_info['institute']
 
     return
 
@@ -117,7 +117,7 @@ def form_to_str(player_form, team_form, include_birthdate=True, include_institut
     print(player_form.birthdate)
     print(player_form.idplayer)
     if include_birthdate and player_form.birthdate.data is not None:
-        rating_str = ';'.join([rating_str, player_form.birthdate.data])
+        rating_str = ';'.join([rating_str, str(player_form.birthdate.data)])
     if include_institute and team_form.institute.data is not None:
         rating_str = ';'.join([rating_str, team_form.institute.data])
 
@@ -153,7 +153,7 @@ def save_csv_recaps(recaps_form, include_birthdate=True, include_institute=True,
                                e.form.patronymic.data])
 
         if include_birthdate:
-            rating_str = ';'.join([rating_str, e.form.birthdate.data if e.form.birthdate.data is not None else ''])
+            rating_str = ';'.join([rating_str, str(e.form.birthdate.data) if e.form.birthdate.data is not None else ''])
         if include_institute:
             rating_str = ';'.join([rating_str, recaps_form.institute.data if recaps_form.institute.data is not None else ''])
             rating_strs.append(rating_str)

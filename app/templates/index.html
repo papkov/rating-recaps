@@ -37,6 +37,7 @@
                     <hr>
                     <!-- Players' data -->
                     {% for player_form in recaps_form.player_forms %}
+                        {{ player_form.hidden_tag() }}
                         <div class="row">
                             <!-- Player id and search button -->
                             <div class="col-12 col-md-2">
@@ -102,8 +103,24 @@
         {% endwith %}
 
         {% if recaps_form.errors %}
-            <div class="alert alert-warning">{{ recaps_form.errors }}</div>
+        <div class="alert alert-warning">{{ recaps_form.errors }}</div>
         {% endif %}
+
+        {#
+        {% for source, error in recaps_form.errors.items() %}
+            {% if error is not string %}
+                {% for e in error %}
+                    {% for source_2, error in e.items() %}
+                        <div class="alert alert-warning">{{ "{} () - {}".format(source_2, source, error) }}</div>
+                    {% endfor %}
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-warning">{{ "{} - {}".format(source, error) }}</div>
+            {% endif %}
+        {% endfor %}
+        #}
+
+
 
     </div>
 {% endblock %}

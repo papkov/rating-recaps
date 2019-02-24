@@ -27,8 +27,8 @@ class PlayerForm(FlaskForm):
 class TeamForm(FlaskForm):
     idteam = StringField('ID', validators=[InputRequired()])
     team_name = StringField('Название', validators=[InputRequired()])
-    town = StringField('Город')
-    institute = StringField('Вуз')
+    town = StringField('Город', validators=[InputRequired()])
+    institute = StringField('Вуз', validators=[InputRequired()])
 
 
 # Dynamically changing form that encapsulates all the fields

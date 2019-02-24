@@ -4,6 +4,7 @@ from flask import render_template, flash, redirect, url_for, request, send_from_
 
 from app.rating import *
 from app.form_utils import *
+recaps_folder = '../collected_recaps'
 
 
 @app.route('/', methods=["GET", "POST"])
@@ -127,12 +128,24 @@ def index():
 
         # Handle save or send recaps
         if request.method == 'POST' and ('btn-save-recaps' in request.form or 'btn-send-recaps' in request.form):
+            if not recaps_form.validate():
+                flash('Error! Validation failed')
+                break
             # print(get_csv(player_forms, team_form))
             # render_template('index.html', title='Home', team_form=team_form, player_forms=player_forms, send_form=send_form)
             # save_csv(player_forms, team_form)
+
             save_csv_recaps(recaps_form)
-            flash('Form saved!')
-            return redirect(url_for('safe_csv_sender', filename='recaps_{}.csv'.format(recaps_form.idteam.data)))
+            fn = 'recaps_{}.csv'.format(recaps_form.idteam.data)
+            if 'btn-save-recaps' in request.form:
+                flash('Form saved!')
+                return redirect(url_for('safe_csv_sender', filename=fn))
+            else:
+                flash('Form saved!')
+                # if fn in os.listdir(recaps_folder):
+                #     flash('Form saved!')
+                # else:
+                #     flash('Error! Something went wrong, form was not saved')
 
         # dump_forms_session(team_form, player_forms)
 
@@ -247,7 +260,7 @@ def login():
 @app.route('/<filename>')
 def safe_csv_sender(filename):
     app.logger.info('Download file {}'.format(filename))
-    return send_from_directory('../collected_recaps',
+    return send_from_directory(recaps_folder,
                                filename,
                                mimetype='text/csv',
                                as_attachment=True,
