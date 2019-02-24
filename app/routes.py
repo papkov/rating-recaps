@@ -92,12 +92,13 @@ def index():
     # Handle save or send recaps
     if request.method == 'POST' and ('btn-save-recaps' in request.form or 'btn-send-recaps' in request.form):
         # print(get_csv(player_forms, team_form))
+        # render_template('index.html', title='Home', team_form=team_form, player_forms=player_forms, send_form=send_form)
         save_csv(player_forms, team_form)
+        flash('Form saved!')
         return redirect(url_for('safe_csv_sender', filename='recaps_{}.csv'.format(team_form.idteam.data)))
 
     dump_forms_session(team_form, player_forms)
-    return render_template('index.html', title='Home', team_form=team_form,
-                           player_forms=player_forms, send_form=send_form)
+    return render_template('index.html', title='Home', team_form=team_form, player_forms=player_forms, send_form=send_form)
 
 
 @app.route("/login", methods=["GET", "POST"])

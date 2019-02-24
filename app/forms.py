@@ -25,3 +25,33 @@ class TeamForm(FlaskForm):
     team_name = StringField('Название', validators=[InputRequired()])
     town = StringField('Город')
     institute = StringField('Вуз')
+
+
+# Dynamically changing form that encapsulates all the fields
+class RecapsForm(FlaskForm):
+
+    idteam = StringField('ID', validators=[InputRequired()])
+    team_name = StringField('Название', validators=[InputRequired()])
+    town = StringField('Город')
+    institute = StringField('Вуз')
+
+    def __new__(cls, n_players, **kwargs):
+        SelectField()
+        fields = dict(
+            idplayer=[StringField, {'label': 'ID', 'validators': [InputRequired()]}],
+            status=[SelectField, {'label': 'Статус', 'choices': [('Б', 'Б'), ('К', 'К'), ('Л', 'Л')],
+                                  'validators': [InputRequired()]}],
+            surname=[StringField, {'label': 'Фамилия', 'validators': [InputRequired()]}],
+            name=[StringField, {'label': 'Имя', 'validators': [InputRequired()]}],
+            patronymic=[StringField, {'label': 'Отчество', 'validators': [InputRequired()]}],
+            birthdate=[DateField, {'label': 'Дата рождения', 'validators': [InputRequired()]}]
+        )
+
+        for i in range(n_players):
+            for name in fields:
+                field_name = "{}_{}".format(name, i)
+                field = fields[name][0](**fields[name][1])
+                setattr(cls, field_name, field)
+
+        return super(RecapsForm, cls).__new__(cls, **kwargs)
+

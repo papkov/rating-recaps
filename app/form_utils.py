@@ -43,7 +43,7 @@ def populate_team_form(team_form, team_info):
         team_form.institute.data = team_info['institute']
 
 
-def form_to_str(player_form, team_form, include_birthdate=False, include_institute=False):
+def form_to_str(player_form, team_form, include_birthdate=True, include_institute=True):
     rating_str = ';'.join([team_form.idteam.data,
                            team_form.team_name.data,
                            team_form.town.data,
@@ -52,9 +52,12 @@ def form_to_str(player_form, team_form, include_birthdate=False, include_institu
                            player_form.surname.data,
                            player_form.name.data,
                            player_form.patronymic.data])
-    if include_birthdate:
+    print(team_form.institute)
+    print(player_form.birthdate)
+    print(player_form.idplayer)
+    if include_birthdate and player_form.birthdate.data is not None:
         rating_str = ';'.join([rating_str, player_form.birthdate.data])
-    if include_institute:
+    if include_institute and team_form.institute.data is not None:
         rating_str = ';'.join([rating_str, team_form.institute.data])
 
     return rating_str
