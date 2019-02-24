@@ -38,23 +38,28 @@ def index():
                     break
                 flash('Requested ID {} for team {}'.format(request.form['idteam'], team_info["name"]))
 
-                # Get base recaps, pre-fill recaps form with it
-                status_code, team_recaps = get_base_recaps(recaps_form.idteam.data)
-                if status_code != 200:
-                    flash('Rating request for base recaps failed with status code {}'.format(status_code))
-                    break
-
-                # Set n_players based on response, create new recaps form
-                session['n_players'] = len(team_recaps['players'])
-                print(session['n_players'])
-                # recaps_form = RecapsForm(session['n_players'])
-
                 # Populate our new form with team data from rating.chgk.info
                 populate_team_form(recaps_form, team_info)
 
                 # Clean form if it's filled with something
                 for i in range(len(recaps_form.player_forms.entries)):
                     recaps_form.player_forms.pop_entry()
+
+                # Get base recaps, pre-fill recaps form with it
+                status_code, team_recaps = get_base_recaps(recaps_form.idteam.data)
+                if status_code != 200:
+                    flash('Rating request for base recaps failed with status code {}'.format(status_code))
+                    break
+                if not team_recaps:
+                    flash('Error! There are no base recaps for team {}'.format(request.form['idteam']))
+                    for i in range(6):
+                        recaps_form.player_forms.append_entry()
+                    break
+
+                # Set n_players based on response, create new recaps form
+                # session['n_players'] = len(team_recaps['players'])
+                # print(session['n_players'])
+                # recaps_form = RecapsForm(session['n_players'])
 
                 # Populate form with player data
                 for i, idplayer in enumerate(team_recaps['players']):
@@ -72,12 +77,20 @@ def index():
                 app.logger.info('Create a new team with ID 0')
                 flash('Create a new team with ID 0')
 
-                session['n_players'] = 6
+                # Clean form if it's filled with something
+                for i in range(len(recaps_form.player_forms.entries)):
+                    recaps_form.player_forms.pop_entry()
+
+                # session['n_players'] = 6
                 # recaps_form = RecapsForm(session['n_players'])
-                for i in range(session['n_players']):
+                for i in range(6):
                     # add_players_to_form(recaps_form)
                     recaps_form.player_forms.append_entry()
+
                 recaps_form.idteam.data = '0'
+                recaps_form.team_name.data = ''
+                recaps_form.institute.data = ''
+                recaps_form.town.data = ''
 
         # Handle find player by id
         if request.method == 'POST' and 'btn-find-player' in request.form:
