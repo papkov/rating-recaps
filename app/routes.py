@@ -1,10 +1,10 @@
 from flask import render_template, flash, redirect, url_for, request, send_from_directory
-
+import pandas as pd
 
 
 from app.rating import *
 from app.form_utils import *
-recaps_folder = '../collected_recaps'
+recaps_folder = 'collected_recaps'
 
 
 @app.route('/', methods=["GET", "POST"])
@@ -280,3 +280,38 @@ def safe_csv_sender(filename):
                                attachment_filename=filename
                                )
 
+
+@app.route('/accepted')
+def accepted():
+    if recaps_folder not in os.listdir('.'):
+        os.mkdir(os.path.join(recaps_folder))
+
+    accepted_fn = 'accepted.csv'
+    columns = ['ID', 'Название', 'Город', 'Вуз']
+    accepted_csv = None
+    if accepted_fn in os.listdir(recaps_folder):
+        accepted_csv = pd.read_csv(os.path.join(recaps_folder, accepted_fn), header=0, index_col=0)
+
+    collected_ids = [int(fn.split('_')[1].split('.')[0]) for fn in os.listdir(recaps_folder) if fn.startswith('recaps_')]
+    # print(collected_ids)
+    if accepted_csv is None:
+        accepted_csv = pd.DataFrame(columns=columns)
+
+    # print(accepted_csv['ID'].tolist())
+    for team_id in collected_ids:
+        if team_id not in accepted_csv['ID'].tolist():
+            # Could be rewritten to fetch data from rating.chgk.info
+            team_recaps = pd.read_csv(os.path.join(recaps_folder, 'recaps_{}.csv'.format(team_id)), index_col=None,
+                                      header=None, sep=';')
+            # print(team_recaps)
+            # Get team id, name, town and institute
+            team_info = team_recaps.iloc[:1, [0, 1, 2, -1]]
+            team_info.columns = columns
+            # print(team_info)
+            accepted_csv = pd.concat([accepted_csv, team_info], axis=0).reset_index(drop=True)
+            # accepted_csv = accepted_csv.append(pd.DataFrame(team_info, columns=columns), ignore_index=True)
+
+    accepted_csv.to_csv(os.path.join(recaps_folder, accepted_fn))
+    return render_template("accepted.html", title="Accepted",
+                           table=accepted_csv.to_html(classes=["table-bordered", "table-striped", "table-hover"],
+                                                      col_space=50))
