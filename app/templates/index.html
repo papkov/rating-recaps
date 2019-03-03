@@ -65,6 +65,23 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Player flashed messages (search results) -->
+                        {% with errors = get_flashed_messages(category_filter=[player_form.form.find.name]) %}
+                            {% if errors %}
+                                <div class="alert alert-info alert-dismissible" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                    <!--<a class="close" href="#">×</a>-->
+                                    <div>
+                                      <ul>
+                                        {% for msg in errors %}
+                                            <li>{{ msg }}</li>
+                                        {% endfor %}
+                                      </ul>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
                         <br>
                     {% endfor %}
 
@@ -87,18 +104,15 @@
         <!--Flashed messages display-->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-
-                {% for message in messages %}
-                    {% if "Error" not in message[1] and "failed" not in message[1] %}
-                        <div class="alert alert-info"> <strong>Success! </strong> {{ message[1] }}</div>
+                {% for category, message in messages %}
+                    {% if category == "success" %}
+                        <div class="alert alert-info"> <strong>Success! </strong> {{ message }}</div>
                     {% endif %}
 
-                    {% if "Error" in message[1] or "failed" in message[1] %}
-                        <div class="alert alert-warning"> {{ message[1] }}</div>
+                    {% if category == "error" %}
+                        <div class="alert alert-warning"> <strong>Error! </strong> {{ message }}</div>
                     {% endif %}
                 {% endfor %}
-
-
             {% endif %}
         {% endwith %}
 

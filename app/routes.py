@@ -36,9 +36,9 @@ def index():
                 # Get team info
                 status_code, team_info = get_team_info(request.form['idteam'])
                 if status_code != 200:
-                    flash('Rating request for team info failed with status code {}'.format(status_code))
+                    flash('Rating request for team info failed with status code {}'.format(status_code), 'error')
                     break
-                flash('Requested ID {} for team {}'.format(request.form['idteam'], team_info["name"]))
+                flash('Requested ID {} for team {}'.format(request.form['idteam'], team_info["name"]), 'success')
 
                 # Populate our new form with team data from rating.chgk.info
                 populate_team_form(recaps_form, team_info)
@@ -50,10 +50,10 @@ def index():
                 # Get base recaps, pre-fill recaps form with it
                 status_code, team_recaps = get_base_recaps(recaps_form.idteam.data)
                 if status_code != 200:
-                    flash('Rating request for base recaps failed with status code {}'.format(status_code))
+                    flash('Rating request for base recaps failed with status code {}'.format(status_code), 'error')
                     break
                 if not team_recaps:
-                    flash('Error! There are no base recaps for team {}'.format(request.form['idteam']))
+                    flash('Error! There are no base recaps for team {}'.format(request.form['idteam']), 'error')
                     for i in range(6):
                         recaps_form.player_forms.append_entry()
                     break
@@ -62,7 +62,8 @@ def index():
                 for i, idplayer in enumerate(team_recaps['players']):
                     status_code, player_info = get_player_info(idplayer)
                     if status_code != 200:
-                        flash('Rating request for player {} info failed with status code {}'.format(idplayer, status_code))
+                        flash('Rating request for player {} info failed with status code {}'.format(
+                            idplayer, status_code), 'error')
                         break
                     else:
                         recaps_form.player_forms.append_entry()
@@ -71,7 +72,7 @@ def index():
             # If we create a new team with id 0
             else:
                 app.logger.info('Create a new team with ID 0')
-                flash('Create a new team with ID 0')
+                flash('Create a new team with ID 0', 'success')
 
                 # Clean form if it's filled with something
                 for i in range(len(recaps_form.player_forms.entries)):
@@ -90,19 +91,49 @@ def index():
             # Set field names
             btn_name = request.form['btn-find-player']
             form_id = int(btn_name.split('-')[1])
-            field_name = 'player_forms-{}-idplayer'.format(form_id)
+            field_id_idplayer = 'player_forms-{}-idplayer'.format(form_id)
+            field_id_surname = 'player_forms-{}-surname'.format(form_id)
+            field_id_name = 'player_forms-{}-name'.format(form_id)
+            field_id_patronymic = 'player_forms-{}-patronymic'.format(form_id)
 
-            if request.form[field_name] != 0:
-                app.logger.info('Look for player id {}'.format(request.form[field_name]))
-                status_code, player_info = get_player_info(request.form[field_name])
+            # If search by id
+            if request.form[field_id_idplayer] != 0 and request.form[field_id_idplayer] != '':
+                app.logger.info('Look for player id {}'.format(request.form[field_id_idplayer]))
+                status_code, player_info = get_player_info(request.form[field_id_idplayer])
                 if status_code != 200:
-                    flash('Rating request for player {} info failed with status code {}'.format(request.form[field_name], status_code))
+                    flash('Rating request for player {} info failed with status code {}'.format(
+                        request.form[field_id_idplayer], status_code), 'error')
                     break
 
+                # Find correct field to populate
                 for e in recaps_form.player_forms.entries:
                     if e.form.find.name == btn_name:
                         populate_player_form(e.form, player_info)
-                app.logger.info('Populated form {} with data from id {}'.format(form_id, request.form[field_name]))
+                app.logger.info('Populated form {} with data from id {}'.format(
+                    form_id, request.form[field_id_idplayer]))
+            # Else search by player info
+            else:
+                status_code, players_json = find_player(request.form[field_id_name],
+                                                        request.form[field_id_surname],
+                                                        request.form[field_id_patronymic])
+                if status_code != 200:
+                    flash('Search request failed with status code {}'.format(status_code), 'error')
+                    break
+                total_items = int(players_json['total_items'])
+                app.logger.info('{} players in search results'.format(total_items))
+
+                # If there is only one such player, fill the form
+                if total_items == 1:
+                    # Find correct field to populate
+                    for e in recaps_form.player_forms.entries:
+                        if e.form.find.name == btn_name:
+                            populate_player_form(e.form, players_json['items'][0])
+                    app.logger.info('Populated form {} with data from search'.format(form_id))
+                elif total_items < 6:
+                    for player_info in players_json['items']:
+                        flash('{idplayer} {surname} {name} {patronymic}'.format(**player_info), btn_name)
+                else:
+                    flash('Please specify your search request: can\'t print {} results'.format(total_items), btn_name)
 
         # Handle remove player
         if request.method == 'POST' and 'btn-remove-player' in request.form:
@@ -132,16 +163,16 @@ def index():
         # Handle save or send recaps
         if request.method == 'POST' and ('btn-save-recaps' in request.form or 'btn-send-recaps' in request.form):
             if not recaps_form.validate():
-                flash('Error! Validation failed')
+                flash('Validation failed', 'error')
                 break
 
             save_csv_recaps(recaps_form)
             fn = 'recaps_{}.csv'.format(recaps_form.idteam.data)
             if 'btn-save-recaps' in request.form:
-                flash('Form saved!')
+                flash('Form saved!', 'success')
                 return redirect(url_for('safe_csv_sender', filename=fn))
             else:
-                flash('Form saved!')
+                flash('Form saved!', 'success')
 
         break
 
