@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request, send_from_directory
+from flask import render_template, flash, redirect, url_for, request, send_from_directory, send_file
 import pandas as pd
 from datetime import datetime
 
@@ -190,10 +190,18 @@ def login():
     return render_template("login.html", title="Sign in", form=form)
 
 
-@app.route('/<filename>')
+@app.route('/<path:filename>')
 def safe_csv_sender(filename):
+    # filename += '.csv'
     app.logger.info('Download file {}'.format(filename))
-    return send_from_directory(recaps_folder,
+    # print(os.listdir(recaps_folder))
+    # print(os.path.exists(os.path.join('.', recaps_folder, filename)))
+    # return send_file(os.path.join(recaps_folder, filename),
+    #                  mimetype='text/csv',
+    #                  as_attachment=True,
+    #                  attachment_filename=filename)
+    # TODO: rewrite in abs paths
+    return send_from_directory(os.path.join('..', recaps_folder),
                                filename,
                                mimetype='text/csv',
                                as_attachment=True,
