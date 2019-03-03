@@ -27,45 +27,6 @@ def populate_player_form(player_form, player_info):
     return
 
 
-def add_players_to_form(recaps_form, n_players=1):
-
-    next_player_id = 0
-    if not hasattr(recaps_form, 'next_player_id'):
-        setattr(recaps_form, 'next_player_id', next_player_id)
-    else:
-        next_player_id = getattr(recaps_form, 'next_player_id')
-
-    fields = dict(
-        idplayer={'label': 'ID'},
-        status={'label': 'Статус', 'choices': [('Б', 'Б'), ('К', 'К'), ('Л', 'Л')]},
-        surname={'label': 'Фамилия'},
-        name={'label': 'Имя'},
-        patronymic={'label': 'Отчество'},
-        birthdate={'label': 'Дата рождения'}
-    )
-
-    for i in range(n_players):
-        for name in fields.keys():
-            field_name = "{}_{}".format(name, next_player_id)
-            if name == 'status':
-                field = SelectField(**fields[name], validators=[InputRequired()])
-            elif name == 'birthdate':
-                field = DateField(**fields[name], validators=[InputRequired()])
-            else:
-                field = StringField(**fields[name], validators=[InputRequired()])
-            setattr(recaps_form, field_name, field)
-        next_player_id += 1
-
-    setattr(recaps_form, 'next_player_id', next_player_id)
-
-
-
-def delete_player_form(player_form, player_form_id):
-    for pf in player_fields:
-        delattr(player_form, '{}_{}'.format(pf, player_form_id))
-    return
-
-
 def reset_player_form(player_form):
     # for i in range(len(player_form)):
     #     for pf in player_fields:
@@ -104,42 +65,6 @@ def populate_recaps_form(recaps_form, request_form):
             setattr(getattr(recaps_form, field), 'data', request_form[field])
 
 
-def form_to_str(player_form, team_form, include_birthdate=True, include_institute=True):
-    rating_str = ';'.join([team_form.idteam.data,
-                           team_form.team_name.data,
-                           team_form.town.data,
-                           player_form.status.data,
-                           player_form.idplayer.data,
-                           player_form.surname.data,
-                           player_form.name.data,
-                           player_form.patronymic.data])
-    print(team_form.institute)
-    print(player_form.birthdate)
-    print(player_form.idplayer)
-    if include_birthdate and player_form.birthdate.data is not None:
-        rating_str = ';'.join([rating_str, str(player_form.birthdate.data)])
-    if include_institute and team_form.institute.data is not None:
-        rating_str = ';'.join([rating_str, team_form.institute.data])
-
-    return rating_str
-
-
-def get_csv(player_forms, team_form):
-    rating_strs = [form_to_str(player_form, team_form) for player_form in player_forms if player_form is not None]
-    return '\n'.join(rating_strs)
-
-
-def save_csv(player_forms, team_form, folder_name='collected_recaps'):
-    txt = get_csv(player_forms, team_form)
-
-    if folder_name not in os.listdir('.'):
-        os.mkdir(os.path.join('.', folder_name))
-
-    fn = os.path.join('.', folder_name, 'recaps_{}.csv'.format(team_form.idteam.data))
-    with io.open(fn, 'w+', encoding="utf-8") as f:
-        f.write(txt)
-
-
 def save_csv_recaps(recaps_form, include_birthdate=True, include_institute=True, folder_name='collected_recaps'):
     rating_strs = []
     for e in recaps_form.player_forms.entries:
@@ -166,26 +91,3 @@ def save_csv_recaps(recaps_form, include_birthdate=True, include_institute=True,
     fn = os.path.join('.', folder_name, 'recaps_{}.csv'.format(recaps_form.idteam.data))
     with io.open(fn, 'w+', encoding="utf-8") as f:
         f.write(txt)
-
-
-def dump_forms_session(team_form, player_forms):
-    session['team_form'] = team_form.data
-    session['player_forms'] = [pf.data for pf in player_forms]
-    return
-
-
-def restore_forms_session():
-    app.logger.debug('Session keys: {}'.format([k for k in session.keys()]))
-    team_form = TeamForm()
-    player_forms = []
-    if 'team_form' in session:
-        # team_form.data = session['team_form']
-        populate_team_form(team_form, session['team_form'])
-    if 'player_forms' in session:
-        for spf in session['player_forms']:
-            pf = PlayerForm()
-            populate_player_form(pf, spf)
-            # pf.data = spf.data
-            player_forms.append(pf)
-
-    return team_form, player_forms

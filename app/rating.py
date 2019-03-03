@@ -1,5 +1,4 @@
 import requests
-import json
 from app import app
 
 api_root = 'http://rating.chgk.info/api'
