@@ -167,6 +167,10 @@ def index():
                 break
 
             save_csv_recaps(recaps_form)
+            if recaps_form.invitation_form.position.data is not None:
+                save_invitation_docx(recaps_form)
+                flash('Invitation saved!', 'success')
+
             fn = 'recaps_{}.csv'.format(recaps_form.idteam.data)
             if 'btn-save-recaps' in request.form:
                 flash('Form saved!', 'success')
@@ -231,7 +235,7 @@ def accepted():
             # Could be rewritten to fetch data from rating.chgk.info
             recaps_path = os.path.join(recaps_folder, 'recaps_{}.csv'.format(team_id))
             team_recaps = pd.read_csv(recaps_path, index_col=None,
-                                      header=None, sep=';')
+                                      header=None, sep=',')
             modification_time = os.path.getmtime(recaps_path)
             modification_time = datetime.utcfromtimestamp(modification_time).strftime('%Y-%m-%d %H:%M:%S')
 
@@ -246,3 +250,8 @@ def accepted():
     return render_template("accepted.html", title="Accepted",
                            table=accepted_csv.to_html(classes=["table", "table-striped", "table-hover"],
                                                       col_space=50, index=False))
+
+
+@app.route('/contacts')
+def contacts():
+    return render_template('contacts.html', title='Contacts')

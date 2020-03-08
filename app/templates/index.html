@@ -22,9 +22,10 @@
                                 </div>
                             </div>
                             <!-- Team info -->
-                            <div class="col-12 col-md-3"> {{ recaps_form.team_name(class="form-control", placeholder="Название")}} </div>
-                            <div class="col-12 col-md-3"> {{ recaps_form.town(class="form-control", placeholder="Город")}} </div>
-                            <div class="col-12 col-md-3"> {{ recaps_form.institute(class="form-control", placeholder="Вуз")}} </div>
+                            <div class="col-12 col-md-2"> {{ recaps_form.team_name(class="form-control", placeholder="Название")}} </div>
+                            <div class="col-12 col-md-2"> {{ recaps_form.town(class="form-control", placeholder="Город")}} </div>
+                            <div class="col-12 col-md-2"> {{ recaps_form.institute(class="form-control", placeholder="Вуз")}} </div>
+                            <div class="col-12 col-md-3"> {{ recaps_form.email(class="form-control", placeholder="Контактный e-mail")}} </div>
                             <!-- Add and reset buttons -->
                             <div class="col-12 col-md-1">
                                 <div class="row">
@@ -48,20 +49,23 @@
                                         <!--{{ player_form.form.find(class="btn") }}-->
                                     </div>
 
-                                    <div class="col-10 col-md-8"> {{ player_form.form.idplayer(class="form-control", placeholder="ID") }} </div>
+                                    <div class="col-10 col-md-8"> {{ player_form.form.idplayer(class="form-control", placeholder="ID",
+                                                                     title='ID на сайте rating.chgk.info (если игрок новый, поставьте 0)') }} </div>
                                 </div>
                             </div>
                             <!-- Player info -->
                             <div class="col-12 col-md-2"> {{ player_form.form.surname(class="form-control", placeholder="Фамилия") }} </div>
                             <div class="col-12 col-md-2"> {{ player_form.form.name(class="form-control", placeholder="Имя") }} </div>
                             <div class="col-12 col-md-2"> {{ player_form.form.patronymic(class="form-control", placeholder="Отчество") }} </div>
-                            <div class="col-12 col-md-1"> {{ player_form.form.status(class="form-control", placeholder="К/Б/Л") }} </div>
+                            <div class="col-12 col-md-1"> {{ player_form.form.other(class="form-control", placeholder="пр.",
+                                                             title='Прочая информация, которую вы хотите включить в пришлашение (например, номер учебной группы)') }} </div>
                             <!-- Birthdate and remove button -->
                             <div class="col-12 col-md-3">
                                 <div class="row">
-                                    <div class="col-12 col-md-9"> {{ player_form.form.birthdate(class="form-control", placeholder="Дата рождения") }} </div>
+                                    <div class="col-12 col-md-3"> {{ player_form.form.status(class="form-control", placeholder="К/Б/Л", title='Флаг капитан/базовый игрок/легионер') }} </div>
+                                    <div class="col-12 col-md-7"> {{ player_form.form.birthdate(class="form-control", placeholder="Дата рождения", title='Дата рождения') }} </div>
                                     <!--<div class="col-12 col-md-3 text-center"><button class="btn" name="btn-remove-player" value="{{ loop.index0 }}" title="Убрать игрока"><i class="fa fa-close"> </i></button></div>-->
-                                    <div class="col-12 col-md-3 text-center"><button class="btn" name="btn-remove-player" value="{{ player_form.form.remove.name }}" title="Убрать игрока"><i class="fa fa-close"> </i></button></div>
+                                    <div class="col-12 col-md-2 text-center"><button class="btn" name="btn-remove-player" value="{{ player_form.form.remove.name }}" title="Убрать игрока"><i class="fa fa-close"> </i></button></div>
                                 </div>
                             </div>
                         </div>
@@ -84,6 +88,39 @@
                         {% endwith %}
                         <br>
                     {% endfor %}
+
+                    <!-- Invitation form -->
+                <details>
+                    <summary>Приглашение</summary>
+                    <br>
+                    <p>
+                        Пожалуйста, заполняйте форму ниже в соответствии с примерами
+                        (фамилия и должность должны быть в дательном падеже, название университета в родительном,
+                        а имя и отчество в именительном).
+                        Это позволит нам собрать приглашение автоматически и не редактировать его вручную.
+                    </p>
+                    <div>
+                        {{ recaps_form.invitation_form.hidden_tag() }}
+                        <div class="row">
+                            <div class="col-12 col-md-4"> {{ recaps_form.invitation_form.form.email(class="form-control", placeholder="e-mail университета",
+                                                             title='E-mail, на который мы вышлем пришлашение') }} </div>
+                            <div class="col-12 col-md-4"> {{ recaps_form.invitation_form.form.position(class="form-control", placeholder="ректору",
+                                                             title='Должность человека, на имя которого надо написать приглашение, в дательном падеже (например, "ректору" или "проректору")') }} </div>
+                            <div class="col-12 col-md-4"> {{ recaps_form.invitation_form.form.university(class="form-control", placeholder="университета",
+                                                             title='Официальное название университета в родительном падеже') }} </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-12 col-md-4"> {{ recaps_form.invitation_form.form.first_name(class="form-control", placeholder="Иван",
+                                                             title='Имя в именительном падеже') }} </div>
+                            <div class="col-12 col-md-4"> {{ recaps_form.invitation_form.form.second_name(class="form-control", placeholder="Иванович",
+                                                             title='Отчество в именительном падеже') }} </div>
+                            <div class="col-12 col-md-4"> {{ recaps_form.invitation_form.form.surname(class="form-control", placeholder="Иванову",
+                                                             title='Фамилия в дательном падеже') }} </div>
+                        </div>
+                    </div>
+                </details>
+
 
                     <!-- Submit buttons -->
                     {% if recaps_form.player_forms|length > 0 %}

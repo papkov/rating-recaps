@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, FieldList, FormField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, FieldList, FormField, RadioField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, InputRequired
 
@@ -18,17 +18,31 @@ class PlayerForm(FlaskForm):
     name = StringField('Имя', validators=[InputRequired()])
     patronymic = StringField('Отчество')
     birthdate = DateField('Дата рождения', validators=[InputRequired()])
+    other = StringField('Другое')
 
     find = SubmitField()
     remove = SubmitField()
 
 
+class InvitationForm(FlaskForm):
+    position = StringField('ректору (должность в дательном падеже)')
+    first_name = StringField('Иван')
+    second_name = StringField('Иванович')
+    surname = StringField('Иванову (фамилия в дательном падеже)')
+    university = StringField('Вуз в дательном падеже')
+    email = StringField('ivanov@uni.ru')
+    # university/institute, team_name and recaps come from RecapsForm
+
+
 # Dynamically changing form that encapsulates all the fields
 class RecapsForm(FlaskForm):
-
     idteam = StringField('ID', validators=[InputRequired()])
     team_name = StringField('Название', validators=[InputRequired()])
-    town = StringField('Город')
-    institute = StringField('Вуз')
+    town = StringField('Город', validators=[InputRequired()])
+    institute = StringField('Вуз', validators=[InputRequired()])
+    email = StringField('E-mail', validators=[InputRequired()])
+
     player_forms = FieldList(FormField(PlayerForm), min_entries=0)
+    invitation_form = FormField(InvitationForm)
+
 

@@ -3,6 +3,7 @@ from flask import session
 from app.forms import *
 import io
 import os
+from app.invitation import *
 player_fields = ['idplayer', 'status', 'name', 'surname', 'patronymic', 'birthdate']
 
 
@@ -68,7 +69,7 @@ def populate_recaps_form(recaps_form, request_form):
 def save_csv_recaps(recaps_form, include_birthdate=True, include_institute=True, folder_name='collected_recaps'):
     rating_strs = []
     for e in recaps_form.player_forms.entries:
-        rating_str = ';'.join([recaps_form.idteam.data,
+        rating_str = ','.join([recaps_form.idteam.data,
                                recaps_form.team_name.data,
                                recaps_form.town.data,
                                e.form.status.data,
@@ -78,9 +79,9 @@ def save_csv_recaps(recaps_form, include_birthdate=True, include_institute=True,
                                e.form.patronymic.data])
 
         if include_birthdate:
-            rating_str = ';'.join([rating_str, str(e.form.birthdate.data) if e.form.birthdate.data is not None else ''])
+            rating_str = ','.join([rating_str, str(e.form.birthdate.data) if e.form.birthdate.data is not None else ''])
         if include_institute:
-            rating_str = ';'.join([rating_str, recaps_form.institute.data if recaps_form.institute.data is not None else ''])
+            rating_str = ','.join([rating_str, recaps_form.institute.data if recaps_form.institute.data is not None else ''])
             rating_strs.append(rating_str)
 
     txt = '\n'.join(rating_strs)
@@ -91,3 +92,20 @@ def save_csv_recaps(recaps_form, include_birthdate=True, include_institute=True,
     fn = os.path.join('.', folder_name, 'recaps_{}.csv'.format(recaps_form.idteam.data))
     with io.open(fn, 'w+', encoding="utf-8") as f:
         f.write(txt)
+
+
+def save_invitation_docx(recaps_form):
+    try:
+        invitation_id = len(os.listdir('./invitations/')) + 15
+        get_invitation(invitation_id=invitation_id,
+                       position=recaps_form.invitation_form.position.data,
+                       university=recaps_form.invitation_form.university.data,
+                       first_name=recaps_form.invitation_form.first_name.data,
+                       second_name=recaps_form.invitation_form.second_name.data,
+                       surname=recaps_form.invitation_form.surname.data,
+                       team_name=recaps_form.team_name.data,
+                       recaps=[' '.join([e.form.surname.data, e.form.name.data, e.form.patronymic.data]) +
+                               (f', {e.form.surname.data}' if e.form.surname.data else '')
+                               for e in recaps_form.player_forms.entries])
+    except FileNotFoundError as e:
+        print('File not found', e)
