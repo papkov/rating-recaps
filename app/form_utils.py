@@ -139,7 +139,7 @@ def save_invitation_docx(recaps_form):
                        surname=recaps_form.invitation_form.surname.data,
                        team_name=recaps_form.team_name.data,
                        recaps=[' '.join([e.form.surname.data, e.form.name.data, e.form.patronymic.data]) +
-                               (f', {e.form.surname.data}' if e.form.surname.data else '')
+                               (f', {e.form.other.data}' if e.form.other.data else '')
                                for e in recaps_form.player_forms.entries])
     except FileNotFoundError as e:
         print('File not found', e)
