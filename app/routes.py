@@ -4,7 +4,9 @@ from datetime import datetime
 
 from app.rating import *
 from app.form_utils import *
+
 recaps_folder = 'collected_recaps'
+invitation_folder = 'invitations'
 
 
 # Main page for recaps collection
@@ -167,7 +169,8 @@ def index():
                 break
 
             save_csv_recaps(recaps_form)
-            if recaps_form.invitation_form.position.data is not None:
+            save_team_info_csv(recaps_form)
+            if validate_invitation(recaps_form):
                 save_invitation_docx(recaps_form)
                 flash('Invitation saved!', 'success')
 
@@ -215,19 +218,27 @@ def safe_csv_sender(filename):
 
 @app.route('/accepted')
 def accepted():
+    """
+    Update list of accepted applications each time somebody opens the page
+    :return:
+    """
     if recaps_folder not in os.listdir('.'):
         os.mkdir(os.path.join(recaps_folder))
+    if invitation_folder not in os.listdir('.'):
+        os.mkdir(os.path.join(invitation_folder))
 
     accepted_fn = 'accepted.csv'
-    columns = ['ID', 'Название', 'Город', 'Вуз']
+    columns = ['ID', 'Название', 'Город', 'Вуз', 'Время', 'Приглашение']
     accepted_csv = None
     if accepted_fn in os.listdir(recaps_folder):
         accepted_csv = pd.read_csv(os.path.join(recaps_folder, accepted_fn), header=0, index_col=0)
 
     collected_ids = [int(fn.split('_')[1].split('.')[0]) for fn in os.listdir(recaps_folder) if fn.startswith('recaps_')]
+    invitation_ids = [int(fn.split('_')[0]) for fn in os.listdir(invitation_folder) if
+                     fn.endswith('.docx')]
 
     if accepted_csv is None:
-        accepted_csv = pd.DataFrame(columns=columns + ['Время'])
+        accepted_csv = pd.DataFrame(columns=columns)
 
     for team_id in collected_ids:
         if team_id not in accepted_csv['ID'].tolist():
@@ -241,8 +252,13 @@ def accepted():
 
             # Get team id, name, town and institute
             team_info = team_recaps.iloc[:1, [0, 1, 2, -1]]
-            team_info.columns = columns
+            team_info.columns = columns[:4]
             team_info['Время'] = modification_time
+
+            if team_id in invitation_ids:
+                team_info['Приглашение'] = 'На обработке'
+            else:
+                team_info['Приглашение'] = 'Не требуется'
 
             accepted_csv = pd.concat([accepted_csv, team_info], axis=0).reset_index(drop=True).sort_values('Время')
 

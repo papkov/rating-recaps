@@ -5,7 +5,7 @@ from shutil import copyfile
 import re
 
 
-def get_invitation(invitation_id, position, university, first_name, second_name, surname, team_name, recaps):
+def get_invitation(team_id, invitation_id, position, university, first_name, second_name, surname, team_name, recaps):
     substitution = {
         'position': position,
         'university': university,
@@ -21,7 +21,7 @@ def get_invitation(invitation_id, position, university, first_name, second_name,
     }
 
     template = './data/invitation_template.docx'
-    invitation = f'./invitations/Приглашение_ОЧВР_{team_name}.docx'
+    invitation = f'./invitations/{team_id}_Приглашение_ОЧВР_{team_name}.docx'
     # copyfile(template, invitation)
     # return docx_replace(template, invitation, substitution)
     doc = Document(template)

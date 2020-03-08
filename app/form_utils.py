@@ -2,6 +2,7 @@ from app import app
 from flask import session
 from app.forms import *
 import io
+import pandas as pd
 import os
 from app.invitation import *
 player_fields = ['idplayer', 'status', 'name', 'surname', 'patronymic', 'birthdate']
@@ -66,7 +67,7 @@ def populate_recaps_form(recaps_form, request_form):
             setattr(getattr(recaps_form, field), 'data', request_form[field])
 
 
-def save_csv_recaps(recaps_form, include_birthdate=True, include_institute=True, folder_name='collected_recaps'):
+def save_csv_recaps(recaps_form, folder_name='collected_recaps'):
     rating_strs = []
     for e in recaps_form.player_forms.entries:
         rating_str = ','.join([recaps_form.idteam.data,
@@ -76,13 +77,13 @@ def save_csv_recaps(recaps_form, include_birthdate=True, include_institute=True,
                                e.form.idplayer.data,
                                e.form.surname.data,
                                e.form.name.data,
-                               e.form.patronymic.data])
+                               e.form.patronymic.data,
+                               str(e.form.birthdate.data) if e.form.birthdate.data is not None else '',
+                               e.form.other.data if e.form.other.data is not None else '',
+                               recaps_form.institute.data if recaps_form.institute.data is not None else '',
+                               ])
 
-        if include_birthdate:
-            rating_str = ','.join([rating_str, str(e.form.birthdate.data) if e.form.birthdate.data is not None else ''])
-        if include_institute:
-            rating_str = ','.join([rating_str, recaps_form.institute.data if recaps_form.institute.data is not None else ''])
-            rating_strs.append(rating_str)
+        rating_strs.append(rating_str)
 
     txt = '\n'.join(rating_strs)
 
@@ -94,10 +95,43 @@ def save_csv_recaps(recaps_form, include_birthdate=True, include_institute=True,
         f.write(txt)
 
 
+def validate_invitation(recaps_form):
+    return recaps_form.invitation_form.position.data and  \
+           recaps_form.invitation_form.first_name.data and \
+           recaps_form.invitation_form.second_name.data and \
+           recaps_form.invitation_form.surname.data and \
+           recaps_form.invitation_form.email.data and \
+           recaps_form.invitation_form.university.data
+
+
+def save_team_info_csv(recaps_form, fn='teams.csv'):
+    basic = ','.join([
+        recaps_form.idteam.data,
+        recaps_form.team_name.data,
+        recaps_form.town.data,
+        recaps_form.email.data,
+    ])
+
+    if validate_invitation(recaps_form):
+        invitation = ','.join([
+            recaps_form.invitation_form.position.data,
+            recaps_form.invitation_form.first_name.data,
+            recaps_form.invitation_form.second_name.data,
+            recaps_form.invitation_form.surname.data,
+            recaps_form.invitation_form.email.data
+        ])
+        basic = ','.join([basic, invitation])
+
+    path = os.path.join('./data/', fn)
+    with open(path, 'a+') as f:
+        f.write(basic + '\n')
+
+
 def save_invitation_docx(recaps_form):
     try:
         invitation_id = len(os.listdir('./invitations/')) + 15
-        get_invitation(invitation_id=invitation_id,
+        get_invitation(team_id=recaps_form.idteam.data,
+                       invitation_id=invitation_id,
                        position=recaps_form.invitation_form.position.data,
                        university=recaps_form.invitation_form.university.data,
                        first_name=recaps_form.invitation_form.first_name.data,

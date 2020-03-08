@@ -7,7 +7,8 @@ class RecapsTests(unittest.TestCase):
     #     self.assertEqual(True, False)
 
     def test_get_invitation(self):
-        r = invitation.get_invitation(invitation_id=21,
+        r = invitation.get_invitation(team_id=3423,
+                                      invitation_id=21,
                                       position='ректору',
                                       university='Федерального государственного образовательного бюджетного учреждения '
                                                  'высшего образования',
