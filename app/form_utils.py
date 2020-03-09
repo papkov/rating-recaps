@@ -71,7 +71,7 @@ def save_csv_recaps(recaps_form, folder_name='collected_recaps'):
     rating_strs = []
     for e in recaps_form.player_forms.entries:
         rating_str = ','.join([recaps_form.idteam.data,
-                               recaps_form.team_name.data,
+                               f'"{recaps_form.team_name.data}"',
                                recaps_form.town.data,
                                e.form.status.data,
                                e.form.idplayer.data,
@@ -79,7 +79,7 @@ def save_csv_recaps(recaps_form, folder_name='collected_recaps'):
                                e.form.name.data,
                                e.form.patronymic.data,
                                str(e.form.birthdate.data) if e.form.birthdate.data is not None else '',
-                               e.form.other.data if e.form.other.data is not None else '',
+                               f'"{e.form.other.data}"' if e.form.other.data is not None else '',
                                recaps_form.institute.data if recaps_form.institute.data is not None else '',
                                ])
 
