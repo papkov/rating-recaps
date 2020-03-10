@@ -70,14 +70,14 @@ def populate_recaps_form(recaps_form, request_form):
 def save_csv_recaps(recaps_form, folder_name='collected_recaps'):
     rating_strs = []
     for e in recaps_form.player_forms.entries:
-        rating_str = ','.join([recaps_form.idteam.data,
-                               f'"{recaps_form.team_name.data}"',
-                               recaps_form.town.data,
-                               e.form.status.data,
-                               e.form.idplayer.data,
-                               e.form.surname.data,
-                               e.form.name.data,
-                               e.form.patronymic.data,
+        rating_str = ','.join([recaps_form.idteam.data.strip(),
+                               f'"{recaps_form.team_name.data.strip()}"',
+                               recaps_form.town.data.strip(),
+                               e.form.status.data.strip(),
+                               e.form.idplayer.data.strip(),
+                               e.form.surname.data.strip(),
+                               e.form.name.data.strip(),
+                               e.form.patronymic.data.strip(),
                                str(e.form.birthdate.data) if e.form.birthdate.data is not None else '',
                                f'"{e.form.other.data}"' if e.form.other.data is not None else '',
                                recaps_form.institute.data if recaps_form.institute.data is not None else '',
@@ -90,7 +90,7 @@ def save_csv_recaps(recaps_form, folder_name='collected_recaps'):
     if folder_name not in os.listdir('.'):
         os.mkdir(os.path.join('.', folder_name))
 
-    fn = os.path.join('.', folder_name, 'recaps_{}.csv'.format(recaps_form.idteam.data))
+    fn = os.path.join('.', folder_name, 'recaps_{}.csv'.format(recaps_form.idteam.data.strip()))
     with io.open(fn, 'w+', encoding="utf-8") as f:
         f.write(txt)
 
